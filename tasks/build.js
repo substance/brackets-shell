@@ -220,7 +220,7 @@ module.exports = function (grunt) {
     grunt.registerTask("build-installer-mac", "Build mac installer", function () {
         var done = this.async();
         
-        spawn(["bash buildInstaller.sh"], { cwd: resolve("installer/mac"), env: getBracketsEnv() }).then(function () {
+        spawn(["bash -e buildInstaller.sh"], { cwd: resolve("installer/mac"), env: getBracketsEnv() }).then(function () {
             done();
         }, function (err) {
             grunt.log.error(err);
