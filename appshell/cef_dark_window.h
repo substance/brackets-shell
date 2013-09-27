@@ -89,6 +89,7 @@ protected:
     BOOL HandleMeasureItem(LPMEASUREITEMSTRUCT lpMIS);
     BOOL HandleDrawItem(LPDRAWITEMSTRUCT lpDIS);
     BOOL HandleSettingChange(UINT uFlags, LPCWSTR lpszSection);
+    BOOL HandleNcCalcSize(BOOL bCalcValidRects, NCCALCSIZE_PARAMS* lpncspj, LRESULT* pResult);
 
     int HandleNcHitTest(LPPOINT ptHit);
     void HandleNcMouseLeave();
