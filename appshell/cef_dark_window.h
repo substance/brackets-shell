@@ -90,6 +90,8 @@ protected:
     BOOL HandleDrawItem(LPDRAWITEMSTRUCT lpDIS);
     BOOL HandleSettingChange(UINT uFlags, LPCWSTR lpszSection);
     BOOL HandleNcCalcSize(BOOL bCalcValidRects, NCCALCSIZE_PARAMS* lpncspj, LRESULT* pResult);
+    BOOL HandleSysCommand(UINT uCmd);
+
 
     int HandleNcHitTest(LPPOINT ptHit);
     void HandleNcMouseLeave();
@@ -111,6 +113,8 @@ protected:
 
     // Special Drawing Helpers
     virtual void DoRepaintClientArea();
+    virtual void DoMaximizeWindow();
+
 
     // Rect Computers
     virtual void ComputeWindowIconRect(RECT& rect);

@@ -1048,6 +1048,28 @@ BOOL cef_dark_window::HandleNcLeftButtonUp(UINT uHitTest, LPPOINT point)
     return FALSE;
 }
 
+void cef_dark_window::DoMaximizeWindow()
+{
+    HMONITOR hm = ::MonitorFromWindow(GetSafeWnd(), MONITOR_DEFAULTTONULL);
+    MONITORINFO mi = {0};
+    mi.cbSize = sizeof (mi);
+    ::GetMonitorInfo(hm, &mi);
+
+    SetWindowPos(NULL, mi.rcWork.left, mi.rcWork.top, ::RectWidth(mi.rcWork), ::RectHeight(mi.rcWork), SWP_NOZORDER);
+}
+
+
+BOOL cef_dark_window::HandleSysCommand(UINT uCmd)
+{
+    switch(uCmd & 0xFFF0) {
+    case SC_MAXIMIZE:
+        DoMaximizeWindow();
+        return TRUE;
+    }
+    return FALSE;
+}
+
+
 BOOL cef_dark_window::HandleNcCalcSize(BOOL bCalcValidRects, NCCALCSIZE_PARAMS* lpncsp, LRESULT* result)
 {
 
@@ -1151,6 +1173,10 @@ LRESULT cef_dark_window::WindowProc(UINT message, WPARAM wParam, LPARAM lParam)
         break;
     case WM_SETICON:
         mWindowIcon = 0;
+        break;
+    case WM_SYSCOMMAND:
+        if (HandleSysCommand((UINT)wParam))
+            return 0L;
         break;
     case WM_SETTEXT:
     case WM_ACTIVATE:
