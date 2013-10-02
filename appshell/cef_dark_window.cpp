@@ -1056,6 +1056,7 @@ BOOL cef_dark_window::HandleNcLeftButtonUp(UINT uHitTest, LPPOINT point)
 
 BOOL cef_dark_window::DoMaximizeWindow()
 {
+    BOOL bHandled = FALSE;
     HMONITOR hMonitor = ::MonitorFromWindow(GetSafeWnd(), MONITOR_DEFAULTTONULL);
     if (hMonitor != NULL)
     {
@@ -1076,17 +1077,22 @@ BOOL cef_dark_window::DoMaximizeWindow()
         styles |= WS_MAXIMIZE;
         styles &= ~WS_MINIMIZE;
         ::SetWindowLongPtr(GetSafeWnd(), GWL_STYLE, styles);
+
+        bHandled = TRUE;
     }
-    return TRUE;        // handled
+    return bHandled;
 }
 
 BOOL cef_dark_window::DoRestoreWindow()
 {
+    BOOL bHandled = FALSE;
     if (IsIconic())
     {
         // restore from minimized state
         ShowWindow(!IsZoomed() ? SW_RESTORE : SW_SHOWMAXIMIZED);
-    }
+
+        bHandled = TRUE;
+   }
     else if (IsZoomed())
     {
         // restore from maximized state
@@ -1102,58 +1108,37 @@ BOOL cef_dark_window::DoRestoreWindow()
         mHandlingSizeMessage = TRUE;
         SetWindowPos(NULL, left, top, width, height, SWP_NOCOPYBITS | SWP_FRAMECHANGED | SWP_NOZORDER);
         mHandlingSizeMessage = FALSE;
-    }
-    return TRUE;        // handled
-}
-//
-//BOOL cef_dark_window::DoMinimizeWindow()
-//{
-//    if (IsZoomed())
-//    {
-//        HWND hChildWnd = ::GetWindow(GetSafeWnd(), GW_CHILD);
-//        if (hChildWnd != NULL)
-//        {
-////            ::ShowWindow(hChildWnd, SW_HIDE);
-//        }
-//    }
-//    return FALSE;       // pass thru
-//}
 
+        bHandled = TRUE;
+    }
+    return bHandled;
+}
+
+// WM_SYSCOMMAND handler
 BOOL cef_dark_window::HandleSysCommand(UINT uCmd)
 {
+    BOOL bHandled = FALSE;
     switch(uCmd & 0xFFF0)
     {
     case SC_MAXIMIZE:
-        return DoMaximizeWindow();
+        bHandled = DoMaximizeWindow();
+        break;
     case SC_RESTORE:
-        return DoRestoreWindow();
-    //case SC_MINIMIZE:
-    //    return DoMinimizeWindow();
+        bHandled = DoRestoreWindow();
+        break;
     }
-    return FALSE;
+    return bHandled;
 }
 
-
+// WM_NCCALCSIZE handler
 BOOL cef_dark_window::HandleNcCalcSize(BOOL bCalcValidRects, NCCALCSIZE_PARAMS* lpncsp, LRESULT* result)
 {
-    if (bCalcValidRects && IsZoomed())
+    if (bCalcValidRects && IsZoomed() && !IsIconic())
     {
+        // expand the client area to cover the window frame on the left, bottom, and right sides.
         LPRECT lpWindowRect = &lpncsp->rgrc[0];
-        LPRECT lpClientRect = &lpncsp->rgrc[1];
-        
-        lpWindowRect->top = 48;		//BSCTODO- where did "48" come from?
-        
-        lpncsp->lppos->y = 48;
-        
-        lpncsp->lppos->cx = ::RectWidth(*lpWindowRect);
-        lpncsp->lppos->cy = ::RectHeight(*lpWindowRect);
-
-        lpClientRect->top = lpWindowRect->top +  mNcMetrics.iCaptionHeight + 48;
-        lpClientRect->left = 0;
-
-
+        lpWindowRect->top = mNcMetrics.iCaptionHeight + mNcMetrics.iMenuHeight + ::GetSystemMetrics (SM_CYFRAME);
         *result = WVR_VALIDRECTS;
-
         return TRUE;
     }
 
@@ -1233,7 +1218,7 @@ LRESULT cef_dark_window::WindowProc(UINT message, WPARAM wParam, LPARAM lParam)
         break;
     case WM_SIZE:
         if (mHandlingSizeMessage)
-            return FALSE;
+            return 0L;
         break;
     case WM_SYSCOMMAND:
         if (HandleSysCommand((UINT)wParam))
