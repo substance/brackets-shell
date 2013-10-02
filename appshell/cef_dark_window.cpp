@@ -44,10 +44,6 @@ extern HINSTANCE hInst;
 // Module Globals (Not exported)
 static ULONG_PTR gdiplusToken = NULL;
 
-// Constants
-static const int kWindowFrameZoomFactorCX = 12;
-static const int kWindowFrameZoomFactorCY = 12;
-
 // GDI+ Helpers
 static void RECT2Rect(Gdiplus::Rect& dest, const RECT& src) {
     dest.X = src.left;
@@ -305,13 +301,8 @@ BOOL cef_dark_window::HandleSettingChange(UINT uFlags, LPCWSTR lpszSection)
 // Computes the Rect where the System Icon is drawn in window coordinates
 void cef_dark_window::ComputeWindowIconRect(RECT& rect)
 {
-    int top = ::GetSystemMetrics (SM_CYFRAME);
-    int left = ::GetSystemMetrics (SM_CXFRAME);
-
-    if (IsZoomed()) {
-        top = ::kWindowFrameZoomFactorCY;
-        left = ::kWindowFrameZoomFactorCX;
-    }
+    int top = !IsZoomed() ? ::GetSystemMetrics (SM_CYFRAME) : mNcMetrics.iBorderWidth;
+    int left = !IsZoomed() ? ::GetSystemMetrics (SM_CXFRAME) : mNcMetrics.iBorderWidth;
 
     ::SetRectEmpty(&rect);
     rect.top =  top;
@@ -327,10 +318,6 @@ void cef_dark_window::ComputeWindowCaptionRect(RECT& rect)
     GetWindowRect(&wr);
 
     int top = mNcMetrics.iBorderWidth;
-
-    if (IsZoomed()) {
-        top = ::kWindowFrameZoomFactorCY;
-    }
 
     rect.top = top;
     rect.bottom = rect.top + mNcMetrics.iCaptionHeight;
