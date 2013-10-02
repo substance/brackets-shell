@@ -34,6 +34,10 @@
 #pragma comment(lib, "gdiplus")
 #pragma comment(lib, "UxTheme")
 
+//BSCTODO
+#pragma optimize("", off)
+#pragma warning( disable: 4748 )
+
 // Externals
 extern HINSTANCE hInst;
 
@@ -104,7 +108,9 @@ cef_dark_window::cef_dark_window() :
     mCaptionFont(0),
     mMenuFont(0),
     mHighlightBrush(0),
-    mHoverBrush(0)
+    mHoverBrush(0),
+    mIsZoomed(FALSE),
+    mHandlingSizeMessage(FALSE)
 {
     ::ZeroMemory(&mNcMetrics, sizeof(mNcMetrics));
 }
@@ -1048,23 +1054,81 @@ BOOL cef_dark_window::HandleNcLeftButtonUp(UINT uHitTest, LPPOINT point)
     return FALSE;
 }
 
-void cef_dark_window::DoMaximizeWindow()
+BOOL cef_dark_window::DoMaximizeWindow()
 {
-    HMONITOR hm = ::MonitorFromWindow(GetSafeWnd(), MONITOR_DEFAULTTONULL);
-    MONITORINFO mi = {0};
-    mi.cbSize = sizeof (mi);
-    ::GetMonitorInfo(hm, &mi);
+    HMONITOR hMonitor = ::MonitorFromWindow(GetSafeWnd(), MONITOR_DEFAULTTONULL);
+    if (hMonitor != NULL)
+    {
+        SaveWindowRestoreRect();    // save the restored rect
 
-    SetWindowPos(NULL, mi.rcWork.left, mi.rcWork.top, ::RectWidth(mi.rcWork), ::RectHeight(mi.rcWork), SWP_NOZORDER);
+        SetZoomed(TRUE);            // remember that we're maximized
+
+        // maximize the window to the current monitor
+        MONITORINFO info = {0};
+        info.cbSize = sizeof (info);
+        ::GetMonitorInfo(hMonitor, &info);
+        mHandlingSizeMessage = TRUE;
+        SetWindowPos(NULL, info.rcWork.left, info.rcWork.top, ::RectWidth(info.rcWork), ::RectHeight(info.rcWork), SWP_NOZORDER);
+        mHandlingSizeMessage = FALSE;
+
+        // set the window style bit so that the system menu correctly reflects the window state
+        LONG_PTR styles = ::GetWindowLongPtr(GetSafeWnd(), GWL_STYLE);
+        styles |= WS_MAXIMIZE;
+        styles &= ~WS_MINIMIZE;
+        ::SetWindowLongPtr(GetSafeWnd(), GWL_STYLE, styles);
+    }
+    return TRUE;        // handled
 }
 
+BOOL cef_dark_window::DoRestoreWindow()
+{
+    if (IsIconic())
+    {
+        // restore from minimized state
+        ShowWindow(!IsZoomed() ? SW_RESTORE : SW_SHOWMAXIMIZED);
+    }
+    else if (IsZoomed())
+    {
+        // restore from maximized state
+        SetZoomed(FALSE);
+
+        // set the window style bit so that the system menu correctly reflects the window state
+        LONG_PTR styles = ::GetWindowLongPtr(GetSafeWnd(), GWL_STYLE);
+        styles &= ~(WS_MAXIMIZE | WS_MINIMIZE);
+        ::SetWindowLongPtr(GetSafeWnd(), GWL_STYLE, styles);
+
+        int left, top, width, height, showCmd;
+        LoadWindowRestoreRect(left, top, width, height, showCmd);
+        mHandlingSizeMessage = TRUE;
+        SetWindowPos(NULL, left, top, width, height, SWP_NOCOPYBITS | SWP_FRAMECHANGED | SWP_NOZORDER);
+        mHandlingSizeMessage = FALSE;
+    }
+    return TRUE;        // handled
+}
+//
+//BOOL cef_dark_window::DoMinimizeWindow()
+//{
+//    if (IsZoomed())
+//    {
+//        HWND hChildWnd = ::GetWindow(GetSafeWnd(), GW_CHILD);
+//        if (hChildWnd != NULL)
+//        {
+////            ::ShowWindow(hChildWnd, SW_HIDE);
+//        }
+//    }
+//    return FALSE;       // pass thru
+//}
 
 BOOL cef_dark_window::HandleSysCommand(UINT uCmd)
 {
-    switch(uCmd & 0xFFF0) {
+    switch(uCmd & 0xFFF0)
+    {
     case SC_MAXIMIZE:
-        DoMaximizeWindow();
-        return TRUE;
+        return DoMaximizeWindow();
+    case SC_RESTORE:
+        return DoRestoreWindow();
+    //case SC_MINIMIZE:
+    //    return DoMinimizeWindow();
     }
     return FALSE;
 }
@@ -1072,18 +1136,13 @@ BOOL cef_dark_window::HandleSysCommand(UINT uCmd)
 
 BOOL cef_dark_window::HandleNcCalcSize(BOOL bCalcValidRects, NCCALCSIZE_PARAMS* lpncsp, LRESULT* result)
 {
-
-    if (bCalcValidRects && IsZoomed()) {
+    if (bCalcValidRects && IsZoomed())
+    {
         LPRECT lpWindowRect = &lpncsp->rgrc[0];
         LPRECT lpClientRect = &lpncsp->rgrc[1];
         
-        lpWindowRect->top = 48;
-        lpWindowRect->left = 48;
-
-        lpWindowRect->bottom -= 48;
-        lpWindowRect->right -= 48;
+        lpWindowRect->top = 48;		//BSCTODO- where did "48" come from?
         
-        lpncsp->lppos->x = 48;
         lpncsp->lppos->y = 48;
         
         lpncsp->lppos->cx = ::RectWidth(*lpWindowRect);
@@ -1091,8 +1150,6 @@ BOOL cef_dark_window::HandleNcCalcSize(BOOL bCalcValidRects, NCCALCSIZE_PARAMS* 
 
         lpClientRect->top = lpWindowRect->top +  mNcMetrics.iCaptionHeight + 48;
         lpClientRect->left = 0;
-        lpncsp->lppos->cx = ::RectWidth(*lpWindowRect);
-        lpncsp->lppos->cy = ::RectHeight(*lpWindowRect);
 
 
         *result = WVR_VALIDRECTS;
@@ -1174,6 +1231,10 @@ LRESULT cef_dark_window::WindowProc(UINT message, WPARAM wParam, LPARAM lParam)
     case WM_SETICON:
         mWindowIcon = 0;
         break;
+    case WM_SIZE:
+        if (mHandlingSizeMessage)
+            return FALSE;
+        break;
     case WM_SYSCOMMAND:
         if (HandleSysCommand((UINT)wParam))
             return 0L;
@@ -1222,3 +1283,6 @@ LRESULT cef_dark_window::WindowProc(UINT message, WPARAM wParam, LPARAM lParam)
     }
     return lr;
 }
+
+//BSCTODO
+#pragma optimize("", on)

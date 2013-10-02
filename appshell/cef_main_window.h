@@ -44,9 +44,9 @@ public:
 
 protected:
     // Initalization - Protected Members
-    void SaveWindowRestoreRect();
+    virtual void SaveWindowRestoreRect();
     void LoadWindowRestoreRect(int& left, int& top, int& width, int& height, int& showCmd);
-    void RestoreWindowPlacement(int showCmd);
+    virtual void RestoreWindowPlacement(int showCmd);
 
     // Message Handlers
     BOOL HandleEraseBackground();

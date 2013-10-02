@@ -78,7 +78,14 @@ public:
     virtual LRESULT WindowProc(UINT message, WPARAM wParam, LPARAM lParam);
    bool SubclassWindow(HWND hWnd);
 
+    virtual BOOL IsZoomed() { return mIsZoomed; }
+
 protected:
+    // Initalization - Protected Members
+    virtual void SaveWindowRestoreRect() {}
+    virtual void LoadWindowRestoreRect(int& left, int& top, int& width, int& height, int& showCmd) {}
+    void SetZoomed(BOOL isZoomed) { mIsZoomed = isZoomed; }
+
     // Window Message Handlers
     BOOL HandleNcCreate();
     BOOL HandleNcDestroy();
@@ -113,8 +120,10 @@ protected:
 
     // Special Drawing Helpers
     virtual void DoRepaintClientArea();
-    virtual void DoMaximizeWindow();
-
+    
+    BOOL DoMaximizeWindow();
+    BOOL DoRestoreWindow();
+//    BOOL DoMinimizeWindow();
 
     // Rect Computers
     virtual void ComputeWindowIconRect(RECT& rect);
@@ -165,4 +174,7 @@ protected:
     // Metrics and State Data
     NONCLIENTMETRICS             mNcMetrics;
     NonClientButtonStateData     mNonClientData;
+
+    BOOL                         mIsZoomed;
+    BOOL                         mHandlingSizeMessage;
 };

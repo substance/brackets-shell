@@ -156,7 +156,7 @@ public:
     BOOL InvalidateRect(LPRECT lpRect, BOOL bErase = FALSE)
     { return ::InvalidateRect(mWnd, lpRect, bErase); }
 
-    BOOL IsZoomed() 
+    virtual BOOL IsZoomed() 
     { return ::IsZoomed(mWnd); }
 
     BOOL IsIconic() 

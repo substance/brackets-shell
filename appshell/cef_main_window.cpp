@@ -31,6 +31,10 @@
 extern HINSTANCE                hInst;
 extern CefRefPtr<ClientHandler> g_handler;
 
+//BSCTODO
+#pragma optimize("", off)
+#pragma warning( disable: 4748 )
+
 // constants
 static const wchar_t        kWindowClassname[] = L"CEFCLIENT";
 static const wchar_t        kWindowPostionFolder[] = L"Window Position";
@@ -377,6 +381,8 @@ void cef_main_window::LoadWindowRestoreRect(int& left, int& top, int& width, int
 //  Loads the Restores data and positions the window in its previously saved state
 void cef_main_window::RestoreWindowPlacement(int showCmd)
 {
+    SetZoomed(showCmd == SW_MAXIMIZE);
+	
     if (showCmd == SW_MAXIMIZE)
     {
         WINDOWPLACEMENT wp;
@@ -510,3 +516,6 @@ LRESULT cef_main_window::WindowProc(UINT message, WPARAM wParam, LPARAM lParam)
 
     return lr;
 }
+
+//BSCTODO
+#pragma optimize("", on)
