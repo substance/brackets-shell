@@ -1041,13 +1041,14 @@ BOOL cef_dark_window::HandleNcLeftButtonUp(UINT uHitTest, LPPOINT point)
     return FALSE;
 }
 
-BOOL cef_dark_window::DoMaximizeWindow()
+BOOL cef_dark_window::DoMaximizeWindow(BOOL bSaveRect)
 {
     BOOL bHandled = FALSE;
     HMONITOR hMonitor = ::MonitorFromWindow(GetSafeWnd(), MONITOR_DEFAULTTONULL);
     if (hMonitor != NULL)
     {
-        SaveWindowRestoreRect();    // save the restored rect
+        if (bSaveRect)
+            SaveWindowRestoreRect();    // save the restored rect
 
         SetZoomed(TRUE);            // remember that we're maximized
 
@@ -1108,7 +1109,7 @@ BOOL cef_dark_window::HandleSysCommand(UINT uCmd)
     switch(uCmd & 0xFFF0)
     {
     case SC_MAXIMIZE:
-        bHandled = DoMaximizeWindow();
+        bHandled = DoMaximizeWindow(TRUE);
         break;
     case SC_RESTORE:
         bHandled = DoRestoreWindow();
@@ -1123,8 +1124,28 @@ BOOL cef_dark_window::HandleNcCalcSize(BOOL bCalcValidRects, NCCALCSIZE_PARAMS* 
     if (bCalcValidRects && IsZoomed() && !IsIconic())
     {
         // expand the client area to cover the window frame on the left, bottom, and right sides.
-        LPRECT lpWindowRect = &lpncsp->rgrc[0];
-        lpWindowRect->top = mNcMetrics.iCaptionHeight + mNcMetrics.iMenuHeight + ::GetSystemMetrics (SM_CYFRAME);
+        LPRECT lpClientRect = &lpncsp->rgrc[0];
+        LPRECT lpDestRect = &lpncsp->rgrc[1];
+        LPRECT lpSrcRect = &lpncsp->rgrc[2];
+        if (lpClientRect->left < 0)
+        {
+            lpClientRect->right += lpClientRect->left;
+            lpClientRect->bottom += lpClientRect->top;
+            lpClientRect->left = lpClientRect->top = 0;
+        }
+        if (lpDestRect->left < 0)
+            ::CopyRect(lpDestRect, lpClientRect);
+
+        if (lpncsp->lppos->x < 0)
+        {
+            lpncsp->lppos->x = lpClientRect->left;
+            lpncsp->lppos->y = lpClientRect->top;
+            lpncsp->lppos->cx = ::RectWidth(*lpClientRect);
+            lpncsp->lppos->cy = ::RectHeight(*lpClientRect);
+        }
+
+        lpClientRect->top = mNcMetrics.iCaptionHeight + mNcMetrics.iMenuHeight + ::GetSystemMetrics (SM_CYFRAME);
+
         *result = WVR_VALIDRECTS;
         return TRUE;
     }

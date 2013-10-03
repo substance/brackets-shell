@@ -121,7 +121,7 @@ protected:
     // Special Drawing Helpers
     virtual void DoRepaintClientArea();
     
-    BOOL DoMaximizeWindow();
+    BOOL DoMaximizeWindow(BOOL bSaveRect);
     BOOL DoRestoreWindow();
 //    BOOL DoMinimizeWindow();
 
