@@ -117,9 +117,6 @@ BOOL cef_main_window::Create()
 
     DWORD styles =  WS_OVERLAPPEDWINDOW | WS_CLIPCHILDREN | WS_EX_COMPOSITED;
 
-    if (showCmd == SW_MAXIMIZE)
-      styles |= WS_MAXIMIZE;
-
     if (!cef_host_window::Create(::kWindowClassname, GetBracketsWindowTitleText(),
                                 styles, left, top, width, height))
     {
@@ -411,9 +408,7 @@ void cef_main_window::RestoreWindowPlacement(int showCmd)
     //    SetWindowPlacement(&wp);
     //}
 
-    if (showCmd == SW_MAXIMIZE)
-        PostMessage(WM_SYSCOMMAND, SC_MAXIMIZE, 0L);
-    else
+    if (showCmd != SW_MAXIMIZE)
         ShowWindow(showCmd);
 }
 
