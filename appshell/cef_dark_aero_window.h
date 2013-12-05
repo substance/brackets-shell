@@ -21,8 +21,38 @@
  * DEALINGS IN THE SOFTWARE.
  */
 #include "cef_dark_window.h"
+#include <dwmapi.h>
 
 #define CDW_UPDATEMENU WM_USER+1004
+
+// prototypes for DWM function pointers
+typedef HRESULT (*PFNDWMEFICA)(HWND hWnd, __in const MARGINS* pMarInset);
+typedef BOOL (*PFNDWMDWP)(__in HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam, __out LRESULT *plResult);
+typedef HRESULT (*PFNDWMICE)(__out BOOL* pfEnabled);
+
+// manage dynamically loading DesktopWindowManager DLL
+class CDwmDLL
+{
+public:
+    CDwmDLL();
+    ~CDwmDLL();
+
+    // access to DWM API
+    static PFNDWMEFICA GetProcDwmExtendFrameIntoClientArea() { return pfnDwmExtendFrameIntoClientArea; }
+    static PFNDWMDWP GetProcDwmDefWindowProc() { return pfnDwmDefWindowProc; }
+    static PFNDWMICE GetProcDwmIsCompositionEnabled() { return pfnDwmIsCompositionEnabled; }
+
+private:
+    HINSTANCE LoadLibrary();
+    void FreeLibrary();
+
+private:
+    static HINSTANCE mhDwmDll;
+    static PFNDWMEFICA pfnDwmExtendFrameIntoClientArea;
+    static PFNDWMDWP pfnDwmDefWindowProc;
+    static PFNDWMICE pfnDwmIsCompositionEnabled;
+};
+
 
 // Dark window themed window Wrapper
 //  Instantiate this class and subclass any HWND to give the window a dark look

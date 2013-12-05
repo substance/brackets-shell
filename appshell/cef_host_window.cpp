@@ -44,7 +44,9 @@ BOOL cef_host_window::CanUseAreoGlass()
         static BOOL fDwmEnabled = FALSE;
 
         if (!bCalled) {
-            bCalled = SUCCEEDED(DwmIsCompositionEnabled(&fDwmEnabled));
+            PFNDWMICE pfn = CDwmDLL::GetProcDwmIsCompositionEnabled();
+            if (pfn != NULL)
+                bCalled = SUCCEEDED((*pfn)(&fDwmEnabled));
         }
 
         return fDwmEnabled;
