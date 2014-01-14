@@ -33,6 +33,7 @@
 #include <Shlwapi.h>
 #include <Shobjidl.h>
 #include <stdio.h>
+#include <errno.h>
 #include <sys/stat.h>
 #include "config.h"
 #define CLOSING_PROP L"CLOSING"

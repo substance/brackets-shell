@@ -373,7 +373,7 @@ BOOL cef_main_window::HandleCopyData(HWND, PCOPYDATASTRUCT lpCopyData)
         
         if (wstrFilename.find('"') != std::wstring::npos) {
             if (wstrFilename.find(L"\" ") != std::wstring::npos ||
-               (wstrFilename.front() != '"' || wstrFilename.back() != '"')) {
+               (*wstrFilename.begin() != '"' || *wstrFilename.end() != '"')) {
                 hasMultipleFiles = true;
             }
         } else {
@@ -409,7 +409,7 @@ BOOL cef_main_window::HandleCopyData(HWND, PCOPYDATASTRUCT lpCopyData)
         }
 
         // Add the last file or the only file into the file array.
-        if (wstrFilename.front() == '"' && wstrFilename.back() == '"') {
+        if (*wstrFilename.begin() == '"' && *wstrFilename.end() == '"') {
             wstrFileArray += wstrFilename;
         } else if (wstrFilename.length()) {
             wstrFileArray += (L"\"" + wstrFilename + L"\"");
