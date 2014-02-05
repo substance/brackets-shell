@@ -176,6 +176,8 @@ CefRefPtr<CefResourceHandler> ClientHandler::GetResourceHandler(
       CefRefPtr<CefFrame> frame,
       CefRefPtr<CefRequest> request) {
   CefRefPtr<CefResourceHandler> handler;
+  // SUBSTANCE: maybe this is the place where we could implement a
+  // handler to retrieve the application resources from a bundle.
 
   // Execute delegate callbacks.
   RequestDelegateSet::iterator it = request_delegates_.begin();
@@ -256,6 +258,10 @@ void ClientHandler::OnBeforeContextMenu(
     CefRefPtr<CefFrame> frame,
     CefRefPtr<CefContextMenuParams> params,
     CefRefPtr<CefMenuModel> model) {
+  // SUBSTANCE: this is the place to manipulate the native context menu
+  // Obviously `Back`/`Forward` are added somewhere else.
+  // However, we could hide the `Show DevTools` here.
+
   if ((params->GetTypeFlags() & (CM_TYPEFLAG_PAGE | CM_TYPEFLAG_FRAME)) != 0) {
     // Add a separator if the menu already has items.
     if (model->GetCount() > 0)
