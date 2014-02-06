@@ -172,7 +172,7 @@ module.exports = function (grunt) {
         // this should have been a grunt-contrib-copy task "copy:mac", but something goes wrong when creating the .app folder
         spawn([
             "mkdir installer/mac/staging",
-            "cp -R xcodebuild/Release/" + grunt.config("build.name") + ".app installer/mac/staging/"
+            'cp -R "xcodebuild/Release/' + grunt.config("build.name") + '.app" installer/mac/staging/'
         ]).then(function () {
             done();
         }, function (err) {
