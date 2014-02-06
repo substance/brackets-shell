@@ -169,14 +169,15 @@ module.exports = function (grunt) {
     grunt.registerTask("stage-mac", "Stage mac executable files", function () {
         var done = this.async();
 
-        var appDir = "xcodebuild/Release/" + grunt.config("build.name") + ".app";
+        var builtApp = "xcodebuild/Release/Brackets.app";
+        var stageApp = "installer/mac/staging/" + grunt.config("build.name") + ".app";
 
         fs.mkdir("installer/mac/staging", function(err){
             if (err) {
                 grunt.log.error(err);
                 done(false);
             } else {
-                fs.copy(appDir, 'installer/mac/staging/', function (err) {
+                fs.copy(builtApp, stageApp, function (err) {
                     if (err) {
                         grunt.log.error(err);
                         done(false);
