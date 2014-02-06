@@ -35,7 +35,7 @@ module.exports = function (grunt) {
     } else if (platform === "win") {
         staging = "installer/win/staging";
     } else {
-        staging = "installer/linux/debian/package-root/opt/brackets";
+        staging = "installer/linux/debian/package-root/opt/<%= build.name %>";
     }
 
     grunt.initConfig({
@@ -144,8 +144,8 @@ module.exports = function (grunt) {
                         "expand"    : true,
                         "cwd"       : "installer/linux/debian/",
                         "src"       : [
-                            "brackets.desktop",
-                            "brackets"
+                            "Substance Reader.desktop",
+                            "substance-reader"
                         ],
                         "dest"      : "<%= build.staging %>"
                     }
