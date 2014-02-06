@@ -144,8 +144,8 @@ module.exports = function (grunt) {
                         "expand"    : true,
                         "cwd"       : "installer/linux/debian/",
                         "src"       : [
-                            "Substance Reader.desktop",
-                            "substance-reader"
+                            "<%= build.name %>.desktop",
+                            "substance-composer"
                         ],
                         "dest"      : "<%= build.staging %>"
                     }
@@ -187,7 +187,7 @@ module.exports = function (grunt) {
             }
         },
         "build": {
-            "name"              : "Substance Reader",
+            "name"              : "Substance Composer",
             "staging"           : staging
         },
         "git": {
