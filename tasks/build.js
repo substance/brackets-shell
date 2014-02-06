@@ -25,8 +25,8 @@
 
 module.exports = function (grunt) {
     "use strict";
-    
-    var fs          = require("fs"),
+
+    var fs          = require("fs-extra"),
         common      = require("./common")(grunt),
         q           = require("q"),
         semver      = require("semver"),
@@ -168,16 +168,23 @@ module.exports = function (grunt) {
     // task: stage-mac
     grunt.registerTask("stage-mac", "Stage mac executable files", function () {
         var done = this.async();
-        
-        // this should have been a grunt-contrib-copy task "copy:mac", but something goes wrong when creating the .app folder
-        spawn([
-            "mkdir installer/mac/staging",
-            'cp -R "xcodebuild/Release/' + grunt.config("build.name") + '.app" installer/mac/staging/'
-        ]).then(function () {
-            done();
-        }, function (err) {
-            grunt.log.error(err);
-            done(false);
+
+        var appDir = "xcodebuild/Release/" + grunt.config("build.name") + ".app";
+
+        fs.mkdir("installer/mac/staging", function(err){
+            if (err) {
+                grunt.log.error(err);
+                done(false);
+            } else {
+                fs.copy(appDir, 'installer/mac/staging/', function (err) {
+                    if (err) {
+                        grunt.log.error(err);
+                        done(false);
+                    } else {
+                        done();
+                    }
+                });
+            }
         });
     });
     
