@@ -192,7 +192,7 @@ module.exports = function (grunt) {
         },
         "git": {
             "www": {
-                "repo"      : "../reader",    // TODO user configurable?
+                "repo"      : "../composer",    // TODO user configurable?
                 "branch"    : grunt.option("www-branch") || ""
             },
             "shell": {
