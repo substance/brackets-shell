@@ -1,8 +1,8 @@
-#!/bin/bash 
+#!/bin/bash
 
 # config
-releaseName="Brackets"
-dmgName="${releaseName} Sprint 37"
+releaseName="Substance Reader"
+dmgName="${releaseName} alpha"
 format="bzip2"
 encryption="none"
 tmpLayout="./dropDmgConfig/layouts/tempLayout"
