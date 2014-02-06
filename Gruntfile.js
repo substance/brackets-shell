@@ -29,7 +29,7 @@ module.exports = function (grunt) {
         resolve = common.resolve,
         platform = common.platform(),
         staging;
-    
+
     if (platform === "mac") {
         staging = "installer/mac/staging/<%= build.name %>.app/Contents";
     } else if (platform === "win") {
@@ -187,7 +187,7 @@ module.exports = function (grunt) {
             }
         },
         "build": {
-            "name"              : "Brackets",
+            "name"              : "Substance Reader",
             "staging"           : staging
         },
         "git": {
