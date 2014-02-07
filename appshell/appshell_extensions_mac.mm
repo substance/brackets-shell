@@ -618,7 +618,7 @@ int32 WriteBinaryFile(ExtensionString filename, char* buffer, size_t buffer_size
     NSOutputStream* oStream = [NSOutputStream outputStreamToFileAtPath:path append:NO];
 
     [oStream open];
-    NSInteger res = [oStream write:buffer maxLength:buffer_size];
+    NSInteger res = [oStream write:(const uint8_t *)buffer maxLength:(NSUInteger)buffer_size];
     [oStream close];
 
     if (res == -1) {
