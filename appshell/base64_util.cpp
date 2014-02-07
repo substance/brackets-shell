@@ -152,6 +152,8 @@ bool decode(std::string const& encoded_string, unsigned char* buffer, size_t buf
       }
     }
   }
+
+  return true;
 }
 
 } // namespace base64
