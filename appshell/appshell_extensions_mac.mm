@@ -605,8 +605,26 @@ int32 WriteFile(ExtensionString filename, std::string contents, ExtensionString 
     
     if (res == -1) {
         error = [oStream streamError];
-    }  
-    
+    }
+
+    return ConvertNSErrorCode(error, false);
+}
+
+int32 WriteBinaryFile(ExtensionString filename, char* buffer, size_t buffer_size)
+{
+    NSString* path = [NSString stringWithUTF8String:filename.c_str()];
+    NSError* error = nil;
+
+    NSOutputStream* oStream = [NSOutputStream outputStreamToFileAtPath:path append:NO];
+
+    [oStream open];
+    NSInteger res = [oStream write:buffer maxLength:buffer_size];
+    [oStream close];
+
+    if (res == -1) {
+        error = [oStream streamError];
+    }
+
     return ConvertNSErrorCode(error, false);
 }
 

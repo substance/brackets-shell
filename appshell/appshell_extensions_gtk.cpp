@@ -387,6 +387,31 @@ int32 WriteFile(ExtensionString filename, std::string contents, ExtensionString 
     return error;
 }
 
+int32 WriteBinaryFile(ExtensionString filename, char* buffer, size_t buffer_size)
+{
+    const char *filenameStr = filename.c_str();
+    int error = NO_ERROR;
+    GError *gerror = NULL;
+
+    if (g_file_test(filenameStr, G_FILE_TEST_EXISTS) && g_access(filenameStr, W_OK) == -1) {
+        return ERR_CANT_WRITE;
+    }
+
+    FILE* file = fopen(filenameStr, "wb");
+    if (file) {
+        size_t size = fwrite(buffer, sizeof(char), buffer_size, file);
+        if (size != buffer_size) {
+            error = ERR_CANT_WRITE;
+        }
+
+        fclose(file);
+    } else {
+        return ConvertLinuxErrorCode(errno);
+    }
+
+    return error;
+}
+
 int SetPosixPermissions(ExtensionString filename, int32 mode)
 {
     if (chmod(filename.c_str(),mode) == -1) {
