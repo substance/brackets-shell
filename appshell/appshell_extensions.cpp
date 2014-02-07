@@ -303,6 +303,29 @@ public:
                 error = WriteFile(filename, contents, encoding);
                 // No additional response args for this function
             }
+        } else if (message_name == "WriteBinaryFile") {
+            // Parameters:
+            //  0: int32 - callback id
+            //  1: string - filename
+            //  2: array - an array of uint8 data
+            if (argList->GetSize() != 3 ||
+                argList->GetType(1) != VTYPE_STRING ||
+                argList->GetType(2) != VTYPE_LIST) {
+                error = ERR_INVALID_PARAMS;
+            }
+
+            if (error == NO_ERROR) {
+                ExtensionString filename = argList->GetString(1);
+                CefRefPtr<CefListValue> data = argList->GetList(2);
+                size_t size = data->GetSize();
+                char* buf = new char[size];
+                for (size_t i=0; i<size; i++) {
+                    buf[i] = data->GetInt(i);
+                }
+                error = WriteBinaryFile(filename, buf, size);
+                delete[] buf;
+                // No additional response args for this function
+            }
         } else if (message_name == "SetPosixPermissions") {
             // Parameters:
             //  0: int32 - callback id

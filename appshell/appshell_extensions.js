@@ -370,7 +370,12 @@ if (!appshell.app) {
     appshell.fs.writeFile = function (path, data, encoding, callback) {
         WriteFile(callback || _dummyCallback, path, data, encoding);
     };
-    
+
+    native function WriteBinaryFile();
+    appshell.fs.writeBinaryFile = function (path, data, callback) {
+        WriteBinaryFile(callback || _dummyCallback, path, data);
+    };
+
     /**
      * Set permissions for a file or directory.
      *

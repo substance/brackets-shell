@@ -781,6 +781,24 @@ int32 WriteFile(ExtensionString filename, std::string contents, ExtensionString 
     return error;
 }
 
+int32 WriteBinaryFile(ExtensionString filename, char* buffer, size_t buffer_size)
+{
+    HANDLE hFile = CreateFile(filename.c_str(), GENERIC_WRITE,
+        FILE_SHARE_READ, NULL, CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, NULL);
+    DWORD dwBytesWritten;
+    int error = NO_ERROR;
+
+    if (INVALID_HANDLE_VALUE == hFile)
+        return ConvertWinErrorCode(GetLastError(), false);
+
+    if (!WriteFile(hFile, buffer, buffer_size, &dwBytesWritten, NULL)) {
+        error = ConvertWinErrorCode(GetLastError(), false);
+    }
+
+    CloseHandle(hFile);
+    return error;
+}
+
 int32 SetPosixPermissions(ExtensionString filename, int32 mode)
 {
     DWORD dwAttr = GetFileAttributes(filename.c_str());
