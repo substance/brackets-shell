@@ -579,7 +579,25 @@ int32 ReadFile(ExtensionString filename, ExtensionString encoding, std::string& 
         contents = [fileContents UTF8String];
         return NO_ERROR;
     }
-    
+
+    return ConvertNSErrorCode(error, true);
+}
+
+int32 ReadBinaryFile(ExtensionString filename, unsigned char* buffer, size_t buffer_size)
+{
+    NSString* path = [NSString stringWithUTF8String:filename.c_str()];
+
+    NSError* error = nil;
+
+    NSData *data = [NSData dataWithContentsOfFile:path];
+    NSUInteger len = [data length];
+
+    if (len > buffer_size) {
+        return ERR_OUT_OF_SPACE;
+    }
+
+    [data getBytes:buffer length:len];
+
     return ConvertNSErrorCode(error, true);
 }
 
