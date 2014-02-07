@@ -1,25 +1,25 @@
 /*
  * Copyright (c) 2012 Adobe Systems Incorporated. All rights reserved.
- *  
+ *
  * Permission is hereby granted, free of charge, to any person obtaining a
- * copy of this software and associated documentation files (the "Software"), 
- * to deal in the Software without restriction, including without limitation 
- * the rights to use, copy, modify, merge, publish, distribute, sublicense, 
- * and/or sell copies of the Software, and to permit persons to whom the 
+ * copy of this software and associated documentation files (the "Software"),
+ * to deal in the Software without restriction, including without limitation
+ * the rights to use, copy, modify, merge, publish, distribute, sublicense,
+ * and/or sell copies of the Software, and to permit persons to whom the
  * Software is furnished to do so, subject to the following conditions:
- *  
+ *
  * The above copyright notice and this permission notice shall be included in
  * all copies or substantial portions of the Software.
- *  
+ *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
- * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, 
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
  * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
- * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER 
- * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING 
- * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER 
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+ * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
  * DEALINGS IN THE SOFTWARE.
- * 
- */ 
+ *
+ */
 
 #include "appshell_extensions_platform.h"
 #include "appshell_extensions.h"
@@ -61,7 +61,7 @@ public:
     bool IsChromeRunning();
     void CheckForChromeRunning();
     void CheckForChromeRunningTimeout();
-    
+
     void SetWorkspaceNotifications();
     void RemoveWorkspaceNotifications();
 
@@ -72,7 +72,7 @@ public:
     CefRefPtr<CefProcessMessage> GetCloseCallback() { return m_closeLiveBrowserCallback; }
     NSRunningApplication* GetLiveBrowser() { return GetLiveBrowserApp(appId, debugPort); }
     int GetLiveBrowserPid() { return m_liveBrowserPid; }
-    
+
     void SetCloseTimeoutTimer(NSTimer* closeLiveBrowserTimeoutTimer)
             { m_closeLiveBrowserTimeoutTimer = closeLiveBrowserTimeoutTimer; }
     void SetTerminateObserver(ChromeWindowsTerminatedObserver* chromeTerminateObserver)
@@ -94,7 +94,7 @@ private:
     CefRefPtr<CefBrowser>               m_browser;
     ChromeWindowsTerminatedObserver*    m_chromeTerminateObserver;
     int                                 m_liveBrowserPid;
-    
+
     static LiveBrowserMgrMac*           s_instance;
 };
 
@@ -161,7 +161,7 @@ void LiveBrowserMgrMac::CloseLiveBrowserFireCallback(int valToSend)
         // Send response
         m_browser->SendProcessMessage(PID_RENDERER, m_closeLiveBrowserCallback);
     }
-    
+
     // Clear state
     m_closeLiveBrowserCallback = NULL;
     m_browser = NULL;
@@ -171,7 +171,7 @@ void LiveBrowserMgrMac::CheckForChromeRunning()
 {
     if (IsChromeRunning())
         return;
-    
+
     // Unset the LiveBrowser pid
     m_liveBrowserPid = ERR_PID_NOT_FOUND;
 
@@ -182,7 +182,7 @@ void LiveBrowserMgrMac::CheckForChromeRunning()
 void LiveBrowserMgrMac::CheckForChromeRunningTimeout()
 {
     int retVal = (IsChromeRunning() ? ERR_UNKNOWN : NO_ERROR);
-    
+
     //notify back to the app
     CloseLiveBrowserFireCallback(retVal);
 }
@@ -239,10 +239,10 @@ int32 OpenLiveBrowser(ExtensionString argURL, bool enableRemoteDebugging)
 
     // Parse the arguments
     NSString *urlString = [NSString stringWithUTF8String:argURL.c_str()];
-    
+
     // Find instances of the Browser
     NSRunningApplication* liveBrowser = liveBrowserMgr->GetLiveBrowser();
-    
+
     // Get the corresponding chromeApp scriptable browser object
     GoogleChromeApplication* chromeApp = !liveBrowser ? nil : GetGoogleChromeApplicationWithPid([liveBrowser processIdentifier]);
 
@@ -309,17 +309,17 @@ int32 OpenLiveBrowser(ExtensionString argURL, bool enableRemoteDebugging)
 void CloseLiveBrowser(CefRefPtr<CefBrowser> browser, CefRefPtr<CefProcessMessage> response)
 {
     LiveBrowserMgrMac* liveBrowserMgr = LiveBrowserMgrMac::GetInstance();
-    
+
     if (liveBrowserMgr->GetCloseCallback() != NULL) {
         // We can only handle a single async callback at a time. If there is already one that hasn't fired then
         // we kill it now and get ready for the next.
         liveBrowserMgr->CloseLiveBrowserFireCallback(ERR_UNKNOWN);
     }
-    
+
     // Set up new Brackets CloseLiveBrowser callbacks
     liveBrowserMgr->SetBrowser(browser);
     liveBrowserMgr->SetCloseCallback(response);
-    
+
     // Get the currently active LiveBrowser session
     NSRunningApplication* liveBrowser = liveBrowserMgr->GetLiveBrowser();
     if (!liveBrowser) {
@@ -344,7 +344,7 @@ void CloseLiveBrowser(CefRefPtr<CefBrowser> browser, CefRefPtr<CefProcessMessage
         liveBrowserMgr->CloseLiveBrowserFireCallback(NO_ERROR);
         return;
     }
-    
+
     // Set up workspace shutdown notifications
     liveBrowserMgr->SetLiveBrowserPid([liveBrowser processIdentifier]);
     liveBrowserMgr->SetWorkspaceNotifications();
@@ -364,11 +364,11 @@ void CloseLiveBrowser(CefRefPtr<CefBrowser> browser, CefRefPtr<CefProcessMessage
 int32 OpenURLInDefaultBrowser(ExtensionString url)
 {
     NSString* urlString = [NSString stringWithUTF8String:url.c_str()];
-    
+
     if ([[NSWorkspace sharedWorkspace] openURL:[NSURL URLWithString: urlString]] == NO) {
         return ERR_UNKNOWN;
     }
-    
+
     return NO_ERROR;
 }
 
@@ -382,15 +382,15 @@ int32 ShowOpenDialog(bool allowMulitpleSelection,
     NSArray* allowedFileTypes = nil;
     BOOL canChooseDirectories = chooseDirectory;
     BOOL canChooseFiles = !canChooseDirectories;
-    
+
     if (fileTypes != "")
     {
         // fileTypes is a Space-delimited string
-        allowedFileTypes = 
-        [[NSString stringWithUTF8String:fileTypes.c_str()] 
+        allowedFileTypes =
+        [[NSString stringWithUTF8String:fileTypes.c_str()]
          componentsSeparatedByString:@" "];
     }
-    
+
     // Initialize the dialog
     NSOpenPanel* openPanel = [NSOpenPanel openPanel];
     [openPanel setCanChooseFiles:canChooseFiles];
@@ -399,12 +399,12 @@ int32 ShowOpenDialog(bool allowMulitpleSelection,
     [openPanel setAllowsMultipleSelection:allowMulitpleSelection];
     [openPanel setShowsHiddenFiles: YES];
     [openPanel setTitle: [NSString stringWithUTF8String:title.c_str()]];
-    
+
     if (initialDirectory != "")
         [openPanel setDirectoryURL:[NSURL URLWithString:[NSString stringWithUTF8String:initialDirectory.c_str()]]];
-    
+
     [openPanel setAllowedFileTypes:allowedFileTypes];
-    
+
     [openPanel beginSheetModalForWindow:[NSApp mainWindow] completionHandler:nil];
     if ([openPanel runModal] == NSOKButton)
     {
@@ -414,7 +414,7 @@ int32 ShowOpenDialog(bool allowMulitpleSelection,
         }
     }
     [NSApp endSheet:openPanel];
-    
+
     return NO_ERROR;
 }
 
@@ -425,7 +425,7 @@ int32 ShowSaveDialog(ExtensionString title,
 {
     NSSavePanel* savePanel = [NSSavePanel savePanel];
     [savePanel setTitle: [NSString stringWithUTF8String:title.c_str()]];
-    
+
     if (initialDirectory != "")
     {
         NSURL* initialDir = [NSURL fileURLWithPath:[NSString stringWithUTF8String:initialDirectory.c_str()]];
@@ -434,7 +434,7 @@ int32 ShowSaveDialog(ExtensionString title,
 
     [savePanel setNameFieldStringValue:[NSString stringWithUTF8String:proposedNewFilename.c_str()]];
     [savePanel beginSheetModalForWindow:[NSApp mainWindow] completionHandler:nil];
-    
+
     if ([savePanel runModal] == NSFileHandlingPanelOKButton)
     {
         NSURL* theFile = [savePanel URL];
@@ -450,7 +450,7 @@ int32 IsNetworkDrive(ExtensionString path, bool& isRemote)
 {
     NSString* pathStr = [NSString stringWithUTF8String:path.c_str()];
     isRemote = false;
-    
+
     if ([pathStr length] == 0) {
         return ERR_INVALID_PARAMS;
     }
@@ -480,19 +480,19 @@ int32 ReadDir(ExtensionString path, CefRefPtr<CefListValue>& directoryContents)
 {
     NSString* pathStr = [NSString stringWithUTF8String:path.c_str()];
     NSError* error = nil;
-    
+
     if ([pathStr length] == 0) {
         return ERR_INVALID_PARAMS;
     }
 
     NSArray* contents = [[NSFileManager defaultManager] contentsOfDirectoryAtPath:pathStr error:&error];
-    
+
     if (contents != nil)
     {
         NSArrayToCefList(contents, directoryContents);
-        return NO_ERROR; 
+        return NO_ERROR;
     }
-    
+
     return ConvertNSErrorCode(error, true);
 }
 
@@ -500,10 +500,10 @@ int32 MakeDir(ExtensionString path, int32 mode)
 {
     NSError* error = nil;
     NSString* pathStr = [NSString stringWithUTF8String:path.c_str()];
-  
+
     // TODO (issue #1759): honor mode
     [[NSFileManager defaultManager] createDirectoryAtPath:pathStr withIntermediateDirectories:TRUE attributes:nil error:&error];
-  
+
     return ConvertNSErrorCode(error, false);
 }
 
@@ -512,16 +512,16 @@ int32 Rename(ExtensionString oldName, ExtensionString newName)
     NSError* error = nil;
     NSString* oldPathStr = [NSString stringWithUTF8String:oldName.c_str()];
     NSString* newPathStr = [NSString stringWithUTF8String:newName.c_str()];
-  
+
     // Check to make sure newName doesn't already exist. On OS 10.7 and later, moveItemAtPath
     // returns a nice "NSFileWriteFileExists" error in this case, but 10.6 returns a generic
     // "can't write" error.
     if ([[NSFileManager defaultManager] fileExistsAtPath:newPathStr]) {
         return ERR_FILE_EXISTS;
     }
-  
+
     [[NSFileManager defaultManager] moveItemAtPath:oldPathStr toPath:newPathStr error:&error];
-  
+
     return ConvertNSErrorCode(error, false);
 }
 
@@ -529,7 +529,7 @@ int32 GetFileInfo(ExtensionString filename, uint32& modtime, bool& isDir, double
 {
     NSString* path = [NSString stringWithUTF8String:filename.c_str()];
     BOOL isDirectory;
-    
+
     // Strip trailing "/"
     if ([path hasSuffix:@"/"] && [path length] > 1) {
         path = [path substringToIndex:[path length] - 1];
@@ -539,10 +539,10 @@ int32 GetFileInfo(ExtensionString filename, uint32& modtime, bool& isDir, double
     } else {
         return ERR_NOT_FOUND;
     }
-    
+
     NSError* error = nil;
     NSDictionary* fileAttribs = [[NSFileManager defaultManager] attributesOfItemAtPath:path error:&error];
-    
+
     // If path is a symlink, resolve it here and get the attributes at the
     // resolved path
     if ([[fileAttribs fileType] isEqualToString:NSFileTypeSymbolicLink]) {
@@ -552,7 +552,7 @@ int32 GetFileInfo(ExtensionString filename, uint32& modtime, bool& isDir, double
     } else {
         realPath = "";
     }
-    
+
     NSDate *modDate = [fileAttribs valueForKey:NSFileModificationDate];
     modtime = [modDate timeIntervalSince1970];
     NSNumber *filesize = [fileAttribs valueForKey:NSFileSize];
@@ -563,18 +563,18 @@ int32 GetFileInfo(ExtensionString filename, uint32& modtime, bool& isDir, double
 int32 ReadFile(ExtensionString filename, ExtensionString encoding, std::string& contents)
 {
     NSString* path = [NSString stringWithUTF8String:filename.c_str()];
-    
+
     NSStringEncoding enc;
     NSError* error = nil;
-    
+
     if (encoding == "utf8")
         enc = NSUTF8StringEncoding;
     else
-        return ERR_UNSUPPORTED_ENCODING; 
-    
+        return ERR_UNSUPPORTED_ENCODING;
+
     NSString* fileContents = [NSString stringWithContentsOfFile:path encoding:enc error:&error];
-    
-    if (fileContents) 
+
+    if (fileContents)
     {
         contents = [fileContents UTF8String];
         return NO_ERROR;
@@ -607,20 +607,20 @@ int32 WriteFile(ExtensionString filename, std::string contents, ExtensionString 
     NSString* contentsStr = [NSString stringWithUTF8String:contents.c_str()];
     NSStringEncoding enc;
     NSError* error = nil;
-    
+
     if (encoding == "utf8")
         enc = NSUTF8StringEncoding;
     else
         return ERR_UNSUPPORTED_ENCODING;
-    
+
     const NSData* encodedContents = [contentsStr dataUsingEncoding:enc];
     NSUInteger len = [encodedContents length];
     NSOutputStream* oStream = [NSOutputStream outputStreamToFileAtPath:path append:NO];
-    
+
     [oStream open];
     NSInteger res = [oStream write:(const uint8_t*)[encodedContents bytes] maxLength:len];
     [oStream close];
-    
+
     if (res == -1) {
         error = [oStream streamError];
     }
@@ -649,30 +649,30 @@ int32 WriteBinaryFile(ExtensionString filename, unsigned char* buffer, size_t bu
 int32 SetPosixPermissions(ExtensionString filename, int32 mode)
 {
     NSError* error = nil;
-    
+
     NSString* path = [NSString stringWithUTF8String:filename.c_str()];
     NSDictionary* attrs = [NSDictionary dictionaryWithObject:[NSNumber numberWithInt:mode] forKey:NSFilePosixPermissions];
-    
+
     if ([[NSFileManager defaultManager] setAttributes:attrs ofItemAtPath:path error:&error])
         return NO_ERROR;
-    
+
     return ConvertNSErrorCode(error, false);
 }
 
 int32 DeleteFileOrDirectory(ExtensionString filename)
 {
     NSError* error = nil;
-    
+
     NSString* path = [NSString stringWithUTF8String:filename.c_str()];
-    
+
     // Make sure it exists
     if (![[NSFileManager defaultManager] fileExistsAtPath:path]) {
         return ERR_NOT_FOUND;
     }
-        
+
     if ([[NSFileManager defaultManager] removeItemAtPath:path error:&error])
-        return NO_ERROR;       
-    
+        return NO_ERROR;
+
     return ConvertNSErrorCode(error, false);
 }
 
@@ -680,10 +680,10 @@ void MoveFileOrDirectoryToTrash(ExtensionString filename, CefRefPtr<CefBrowser> 
 {
     NSString* pathStr = [NSString stringWithUTF8String:filename.c_str()];
     NSURL* fileUrl = [NSURL fileURLWithPath: pathStr];
-    
+
     static CefRefPtr<CefProcessMessage> s_response;
     static CefRefPtr<CefBrowser> s_browser;
-    
+
     if (s_response) {
         // Already a pending request. This will only happen if MoveFileOrDirectoryToTrash is called
         // before the previous call has completed, which is not very likely.
@@ -691,15 +691,15 @@ void MoveFileOrDirectoryToTrash(ExtensionString filename, CefRefPtr<CefBrowser> 
         browser->SendProcessMessage(PID_RENDERER, response);
         return;
     }
-    
+
     s_browser = browser;
     s_response = response;
-    
+
     [[NSWorkspace sharedWorkspace] recycleURLs:[NSArray arrayWithObject:fileUrl] completionHandler:^(NSDictionary *newURLs, NSError *error) {
         // Invoke callback
         s_response->GetArgumentList()->SetInt(1, ConvertNSErrorCode(error, false));
         s_browser->SendProcessMessage(PID_RENDERER, s_response);
-        
+
         s_response = nil;
         s_browser = nil;
     }];
@@ -710,11 +710,11 @@ int32 CopyFile(ExtensionString src, ExtensionString dest)
     NSError* error = nil;
     NSString* source = [NSString stringWithUTF8String:src.c_str()];
     NSString* destination = [NSString stringWithUTF8String:dest.c_str()];
-    
+
     if ( [[NSFileManager defaultManager] isReadableFileAtPath:source] ) {
         if ( [[NSFileManager defaultManager] isReadableFileAtPath:destination] )
             [[NSFileManager defaultManager] removeItemAtPath:destination error:&error];
-        
+
         [[NSFileManager defaultManager] copyItemAtPath:source toPath:destination error:&error];
 
         return ConvertNSErrorCode(error, false);
@@ -734,10 +734,10 @@ int32 ConvertNSErrorCode(NSError* error, bool isReading)
 {
     if (!error)
         return NO_ERROR;
-    
+
     if( [[error domain] isEqualToString: NSPOSIXErrorDomain] )
     {
-        switch ([error code]) 
+        switch ([error code])
         {
             case ENOENT:
                 return ERR_NOT_FOUND;
@@ -753,11 +753,11 @@ int32 ConvertNSErrorCode(NSError* error, bool isReading)
                 return ERR_OUT_OF_SPACE;
                 break;
         }
-        
+
     }
-    
-    
-    switch ([error code]) 
+
+
+    switch ([error code])
     {
         case NSFileNoSuchFileError:
         case NSFileReadNoSuchFileError:
@@ -779,7 +779,7 @@ int32 ConvertNSErrorCode(NSError* error, bool isReading)
             return ERR_FILE_EXISTS;
             break;
     }
-    
+
     // Unknown error
     return ERR_UNKNOWN;
 }
@@ -793,7 +793,7 @@ void OnBeforeShutdown()
 void CloseWindow(CefRefPtr<CefBrowser> browser)
 {
   NSWindow* window = [browser->GetHost()->GetWindowHandle() window];
-  
+
   // Tell the window delegate it's really time to close
   [[window delegate] performSelector:@selector(setIsReallyClosing)];
   browser->GetHost()->CloseBrowser(true);
@@ -834,7 +834,7 @@ int32 ShowFolderInOSWindow(ExtensionString pathname)
 {
     NSString *filepath = [NSString stringWithUTF8String:pathname.c_str()];
     BOOL isDirectory;
-    
+
     if (![[NSFileManager defaultManager] fileExistsAtPath:filepath isDirectory:&isDirectory]) {
         return ERR_NOT_FOUND;
     }
@@ -854,7 +854,7 @@ int32 GetPendingFilesToOpen(ExtensionString& files)
         files = "[";
         for (NSUInteger i = 0; i < count; i++) {
           NSString* filename = [pendingOpenFiles objectAtIndex:i];
-      
+
           files += ("\"" + std::string([filename UTF8String]) + "\"");
           if (i < count - 1)
             files += ",";
@@ -873,22 +873,22 @@ int32 GetMenuPosition(CefRefPtr<CefBrowser> browser, const ExtensionString& comm
     index = -1;
     parentId = ExtensionString();
     int32 tag = NativeMenuModel::getInstance(getMenuParent(browser)).getTag(commandId);
-    
+
     if (tag == kTagNotFound) {
         return ERR_NOT_FOUND;
     }
-    
+
     NSMenuItem* item = (NSMenuItem*)NativeMenuModel::getInstance(getMenuParent(browser)).getOsItem(tag);
     NSMenu* parentMenu = NULL;
     if (item == NULL) {
         parentMenu = [NSApp mainMenu];
     } else {
         parentMenu = [item menu];
-        parentId = NativeMenuModel::getInstance(getMenuParent(browser)).getParentId(tag);       
+        parentId = NativeMenuModel::getInstance(getMenuParent(browser)).getParentId(tag);
     }
 
     index = [parentMenu indexOfItemWithTag:tag];
-    
+
     return NO_ERROR;
 }
 
@@ -899,7 +899,7 @@ int32 getNewMenuPosition(CefRefPtr<CefBrowser> browser, NSMenu* menu, const Exte
     NativeMenuModel model = NativeMenuModel::getInstance(getMenuParent(browser));
     ExtensionString pos = position;
     ExtensionString relId = relativeId;
-    
+
     NSInteger errCode = NO_ERROR;
     if (position.size() == 0) {
         positionIdx = -1;
@@ -908,13 +908,13 @@ int32 getNewMenuPosition(CefRefPtr<CefBrowser> browser, NSMenu* menu, const Exte
         NSMenuItem* item = (NSMenuItem*)model.getOsItem(startTag);
         NSMenu* parentMenu = [item menu];
         NSInteger startIndex = [parentMenu indexOfItemWithTag:startTag];
-        
+
         if (menu != parentMenu) {
             // Section is in a different menu.
             positionIdx = -1;
             return ERR_NOT_FOUND;
         }
-        
+
         if (pos == "firstInSection") {
             // Move backwards until reaching the beginning of the menu or a separator
             while (startIndex >= 0) {
@@ -931,7 +931,7 @@ int32 getNewMenuPosition(CefRefPtr<CefBrowser> browser, NSMenu* menu, const Exte
             }
         } else { // "lastInSection"
             NSInteger numItems = [parentMenu numberOfItems];
-            
+
             // Move forwards until reaching the end of the menu or a separator
             while (startIndex < numItems) {
                 if ([[parentMenu itemAtIndex:startIndex] isSeparatorItem]) {
@@ -946,20 +946,20 @@ int32 getNewMenuPosition(CefRefPtr<CefBrowser> browser, NSMenu* menu, const Exte
                 pos = "after";
             }
         }
-        
+
         if (pos == "before" || pos == "after") {
             relId = model.getCommandId([[parentMenu itemAtIndex:startIndex] tag]);
         }
     }
-        
+
     if ((pos == "before" || pos == "after") && relId.size() > 0) {
-        ExtensionString parentId; 
+        ExtensionString parentId;
         errCode = GetMenuPosition(browser, relId, parentId, positionIdx);
 
         if (menu && menu != [(NSMenuItem*)model.getOsItem(model.getTag(parentId)) submenu]) {
             errCode = ERR_NOT_FOUND;
         }
-        
+
         // If we don't find the relative ID, return an error
         // and set positionIdx to -1. The item will be appended and an error will be shown.
         if (errCode == ERR_NOT_FOUND) {
@@ -1001,14 +1001,14 @@ int32 AddMenu(CefRefPtr<CefBrowser> browser, ExtensionString itemTitle, Extensio
         [testItem setSubmenu:subMenu];
         [subMenu setDelegate:[[NSApp mainMenu] delegate]];
     }
-   
+
     // Positioning hack. If position and relativeId are both "", put the menu
     // before the window menu *except* if it is the Help menu.
     if (position.size() == 0 && relativeId.size() == 0 && command != "help-menu") {
         position = "before";
         relativeId = "window";
     }
-    
+
     NSInteger positionIdx = -1;
     int32 errCode = getNewMenuPosition(browser, nil, position, relativeId, positionIdx);
 
@@ -1017,7 +1017,7 @@ int32 AddMenu(CefRefPtr<CefBrowser> browser, ExtensionString itemTitle, Extensio
     if (position.size() > 0 && position == "first" && positionIdx == 0) {
         positionIdx = 1;
     }
-    
+
     if (positionIdx > -1) {
         [[NSApp mainMenu] insertItem:testItem atIndex:positionIdx];
     } else {
@@ -1054,7 +1054,7 @@ NSUInteger processKeyString(ExtensionString& key)
     const ExtensionString backspace = (ExtensionString() += NSBackspaceCharacter);
     const ExtensionString tab = (ExtensionString() += NSTabCharacter);
     const ExtensionString enter = (ExtensionString() += NSEnterCharacter);
-    
+
     appshell_extensions::fixupKey(key, "Delete", del);
     appshell_extensions::fixupKey(key, "Backspace", backspace);
     appshell_extensions::fixupKey(key, "Space", " ");
@@ -1103,7 +1103,7 @@ int32 AddMenuItem(CefRefPtr<CefBrowser> browser, ExtensionString parentCommand, 
 
     NSInteger menuIdx;
     testItem = (NSMenuItem*)NativeMenuModel::getInstance(getMenuParent(browser)).getOsItem(parentTag);
-    
+
     if (testItem != nil) {
         NSMenu* subMenu = nil;
         if (![testItem hasSubmenu]) {
@@ -1118,7 +1118,7 @@ int32 AddMenuItem(CefRefPtr<CefBrowser> browser, ExtensionString parentCommand, 
             else {
                 menuIdx = [subMenu indexOfItemWithTag:tag];
             }
-            
+
             if (menuIdx < 0) {
                 NSMenuItem* newItem = nil;
                 if (isSeparator) {
@@ -1136,7 +1136,7 @@ int32 AddMenuItem(CefRefPtr<CefBrowser> browser, ExtensionString parentCommand, 
                     [newItem setTag:tag];
                 }
                 NativeMenuModel::getInstance(getMenuParent(browser)).setOsItem(tag, (void*)newItem);
-                
+
                 NSInteger positionIdx = -1;
                 int32 errCode = getNewMenuPosition(browser, subMenu, position, relativeId, positionIdx);
                 if (positionIdx > -1) {
@@ -1184,7 +1184,7 @@ int32 SetMenuTitle(CefRefPtr<CefBrowser> browser, ExtensionString command, Exten
     if (menuItem == NULL) {
         return ERR_NOT_FOUND;
     }
-    
+
     if ([menuItem submenu]) {
         [[menuItem submenu] setTitle:itemTitleStr];
     } else {
@@ -1204,13 +1204,13 @@ int32 GetMenuTitle(CefRefPtr<CefBrowser> browser, ExtensionString commandId, Ext
     if (item == NULL) {
         return ERR_NOT_FOUND;
     }
-    
+
     if ([item submenu]) {
         title = [[[item submenu] title] UTF8String];
     } else {
         title = [[item title] UTF8String];
     }
-    
+
     return NO_ERROR;
 }
 
@@ -1227,13 +1227,13 @@ int32 SetMenuItemShortcut(CefRefPtr<CefBrowser> browser, ExtensionString command
     if (item == NULL) {
         return ERR_NOT_FOUND;
     }
-    
+
     NSUInteger mask = processKeyString(shortcut);
     NSString* keyStr = [[NSString alloc] initWithUTF8String:shortcut.c_str()];
     keyStr = [keyStr lowercaseString];
     [item setKeyEquivalent:keyStr];
     [item setKeyEquivalentModifierMask:mask];
-    
+
     return NO_ERROR;
 }
 
@@ -1255,7 +1255,7 @@ int32 RemoveMenuItem(CefRefPtr<CefBrowser> browser, const ExtensionString& comma
     if (item == NULL) {
         return ERR_NOT_FOUND;
     }
-    
+
     NSMenu* parentMenu = NULL;
     if ([item respondsToSelector:@selector(menu)]) {
         parentMenu = [item menu];
@@ -1267,7 +1267,7 @@ int32 RemoveMenuItem(CefRefPtr<CefBrowser> browser, const ExtensionString& comma
     } else {
         return ERR_NOT_FOUND;
     }
-    
+
     return NO_ERROR;
 }
 
