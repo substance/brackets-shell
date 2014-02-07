@@ -283,6 +283,50 @@ public:
                 // Set response args for this function
                 responseArgs->SetString(2, contents);
             }
+
+        } else if (message_name == "ReadBinaryFile") {
+            std::cout << "Calling ReadBinaryFile, args:" << argList->GetSize() << "," << argList->GetType(1) << std::endl;
+            // Parameters:
+            //  0: int32 - callback id
+            //  1: string - filename
+            if (argList->GetSize() != 2 ||
+                argList->GetType(1) != VTYPE_STRING) {
+                error = ERR_INVALID_PARAMS;
+            }
+
+            ExtensionString filename;
+            size_t size;
+            unsigned char* buffer = 0;
+            std::string result;
+
+            if (error == NO_ERROR) {
+                std::cout << "... retrieving file info." << std::endl;
+                filename = argList->GetString(1);
+                uint32 modtime;
+                bool isDir;
+                double filesize;
+                ExtensionString realPath;
+                error = GetFileInfo(filename, modtime, isDir, filesize, realPath);
+                size = filesize;
+            }
+
+            if (error == NO_ERROR) {
+                std::cout << "... reading data." << std::endl;
+                buffer = new unsigned char[size];
+                error = ReadBinaryFile(filename, buffer, size);
+            }
+
+            if (error == NO_ERROR) {
+                std::cout << "... base64 encoding." << std::endl;
+                result = base64_util::encode(buffer, size);
+                // Set response args for this function
+                responseArgs->SetString(2, result);
+            }
+
+            if (buffer != 0) {
+                delete[] buffer;
+            }
+
         } else if (message_name == "WriteFile") {
             // Parameters:
             //  0: int32 - callback id

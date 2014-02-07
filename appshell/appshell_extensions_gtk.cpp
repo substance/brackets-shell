@@ -359,6 +359,39 @@ int ReadFile(ExtensionString filename, ExtensionString encoding, std::string& co
     return error;
 }
 
+int ReadBinaryFile(ExtensionString filename, unsigned char* buffer, size_t buffer_size)
+{
+    int error = NO_ERROR;
+    GError *gerror = NULL;
+    gchar *file_content = NULL;
+    gsize len = 0;
+
+    struct stat info_buf;
+    if(stat(filename.c_str(),&info_buf)==-1)
+        return ConvertLinuxErrorCode(errno);
+
+    if (S_ISDIR(info_buf.st_mode)) {
+        return ERR_NOT_FILE;
+    }
+
+    if (!g_file_get_contents(filename.c_str(), &file_content, &len, &gerror)) {
+        error = GErrorToErrorCode(gerror);
+
+        if (error == ERR_NOT_FILE) {
+            error = ERR_CANT_READ;
+        }
+    } else {
+        if (buffer_size < len) {
+            // buffer too small
+            return ERR_OUT_OF_SPACE;
+        }
+        memcpy((void*) buffer, (const void*) file_content, len);
+        g_free(file_content);
+    }
+
+    return error;
+}
+
 
 int32 WriteFile(ExtensionString filename, std::string contents, ExtensionString encoding)
 {

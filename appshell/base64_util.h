@@ -28,7 +28,7 @@
 
 namespace base64_util {
 
-  std::string encode(unsigned char const* , unsigned int len);
+  std::string encode(unsigned char const* buffer, size_t buffer_size);
 
   // Use this to determine the length of the decoded string
   size_t getDecodedLength(const std::string& encoded_string);

@@ -100,6 +100,9 @@ int32 GetFileInfo(ExtensionString filename, uint32& modtime, bool& isDir, double
 
 int32 ReadFile(ExtensionString filename, ExtensionString encoding, std::string& contents);
 
+// you have to create a adequate buffer. Use GetFileInfo to get the file size.
+int32 ReadBinaryFile(ExtensionString filename, unsigned char* buffer, size_t buffer_size);
+
 int32 WriteFile(ExtensionString filename, std::string contents, ExtensionString encoding);
 
 int32 WriteBinaryFile(ExtensionString filename, unsigned char* buffer, size_t size);

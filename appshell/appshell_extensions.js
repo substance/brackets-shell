@@ -376,6 +376,11 @@ if (!appshell.app) {
         WriteBinaryFile(callback || _dummyCallback, path, data);
     };
 
+    native function ReadBinaryFile();
+    appshell.fs.readBinaryFile = function (path, callback) {
+        ReadBinaryFile(callback || _dummyCallback, path);
+    };
+
     /**
      * Set permissions for a file or directory.
      *
