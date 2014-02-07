@@ -104,6 +104,8 @@
       'appshell/string_util.cpp',
       'appshell/string_util.h',
       'appshell/util.h',
+      'appshell/base64_util.h',
+      'appshell/base64_util.cpp'
     ],
     'appshell_sources_win': [
       'appshell/appshell_extensions_win.cpp',
@@ -158,7 +160,7 @@
       'appshell/FullScreenView.h',
       'appshell/FullScreenView.mm',
       'appshell/FullScreenViewController.h',
-      'appshell/FullScreenViewController.mm',     
+      'appshell/FullScreenViewController.mm',
       'appshell/appshell_extensions_mac.mm',
       'appshell/appshell_node_process_mac.mm',
       'appshell/client_app_mac.mm',
@@ -188,7 +190,7 @@
       'appshell/FullScreenView.h',
       'appshell/FullScreenView.mm',
       'appshell/FullScreenViewController.h',
-      'appshell/FullScreenViewController.mm',     
+      'appshell/FullScreenViewController.mm',
       'appshell/appshell_extensions.cpp',
       'appshell/appshell_extensions.h',
       'appshell/appshell_extensions_mac.mm',

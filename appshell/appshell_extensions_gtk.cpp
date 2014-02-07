@@ -387,7 +387,7 @@ int32 WriteFile(ExtensionString filename, std::string contents, ExtensionString 
     return error;
 }
 
-int32 WriteBinaryFile(ExtensionString filename, char* buffer, size_t buffer_size)
+int32 WriteBinaryFile(ExtensionString filename, unsigned char* buffer, size_t buffer_size)
 {
     const char *filenameStr = filename.c_str();
     int error = NO_ERROR;
@@ -399,7 +399,7 @@ int32 WriteBinaryFile(ExtensionString filename, char* buffer, size_t buffer_size
 
     FILE* file = fopen(filenameStr, "wb");
     if (file) {
-        size_t size = fwrite(buffer, sizeof(char), buffer_size, file);
+        size_t size = fwrite(buffer, sizeof(unsigned char), buffer_size, file);
         if (size != buffer_size) {
             error = ERR_CANT_WRITE;
         }

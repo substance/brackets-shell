@@ -610,7 +610,7 @@ int32 WriteFile(ExtensionString filename, std::string contents, ExtensionString 
     return ConvertNSErrorCode(error, false);
 }
 
-int32 WriteBinaryFile(ExtensionString filename, char* buffer, size_t buffer_size)
+int32 WriteBinaryFile(ExtensionString filename, unsigned char* buffer, size_t buffer_size)
 {
     NSString* path = [NSString stringWithUTF8String:filename.c_str()];
     NSError* error = nil;

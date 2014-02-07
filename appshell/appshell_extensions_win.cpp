@@ -781,7 +781,7 @@ int32 WriteFile(ExtensionString filename, std::string contents, ExtensionString 
     return error;
 }
 
-int32 WriteBinaryFile(ExtensionString filename, char* buffer, size_t buffer_size)
+int32 WriteBinaryFile(ExtensionString filename, unsigned char* buffer, size_t buffer_size)
 {
     HANDLE hFile = CreateFile(filename.c_str(), GENERIC_WRITE,
         FILE_SHARE_READ, NULL, CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, NULL);

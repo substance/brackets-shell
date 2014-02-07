@@ -307,22 +307,24 @@ public:
             // Parameters:
             //  0: int32 - callback id
             //  1: string - filename
-            //  2: array - an array of uint8 data
+            //  2: string - binary data encoded with base64
             if (argList->GetSize() != 3 ||
                 argList->GetType(1) != VTYPE_STRING ||
-                argList->GetType(2) != VTYPE_LIST) {
+                argList->GetType(2) != VTYPE_STRING) {
                 error = ERR_INVALID_PARAMS;
             }
 
             if (error == NO_ERROR) {
                 ExtensionString filename = argList->GetString(1);
-                CefRefPtr<CefListValue> data = argList->GetList(2);
-                size_t size = data->GetSize();
-                char* buf = new char[size];
-                for (size_t i=0; i<size; i++) {
-                    buf[i] = data->GetInt(i);
+                const std::string base64_data(argList->GetString(2));
+                size_t size = base64_util::getDecodedLength(base64_data);
+                unsigned char* buf = new unsigned char[size];
+                bool success = base64_util::decode(base64_data, buf, size);
+                if (success) {
+                    error = WriteBinaryFile(filename, buf, size);
+                } else {
+                    error = ERR_UNKNOWN;
                 }
-                error = WriteBinaryFile(filename, buf, size);
                 delete[] buf;
                 // No additional response args for this function
             }

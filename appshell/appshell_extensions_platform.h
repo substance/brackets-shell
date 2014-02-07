@@ -102,7 +102,7 @@ int32 ReadFile(ExtensionString filename, ExtensionString encoding, std::string& 
 
 int32 WriteFile(ExtensionString filename, std::string contents, ExtensionString encoding);
 
-int32 WriteBinaryFile(ExtensionString filename, char* buffer, size_t size);
+int32 WriteBinaryFile(ExtensionString filename, unsigned char* buffer, size_t size);
 
 int32 SetPosixPermissions(ExtensionString filename, int32 mode);
 
